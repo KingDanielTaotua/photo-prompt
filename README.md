@@ -1,4 +1,4 @@
-# Photo Prompt Generator
+# Image Scan Prompt Generator
 
 A sleek, web-based tool designed to analyze any uploaded image and automatically generate a highly structured, comprehensive text prompt using Google's **Gemini 2.5 Flash** Vision AI.
 
