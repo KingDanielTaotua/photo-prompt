@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Prompt Generator</title>
+    <meta name="description" content="Generate detailed AI image generation prompts from your photos.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="blob shape1"></div>
+    <div class="blob shape2"></div>
+
+    <header class="header glass">
+        <div class="logo">
+            <h1>Photo<span>Prompt</span></h1>
+        </div>
+        <div class="actions">
+            <button id="settingsBtn" class="btn icon-btn" title="Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <section id="uploadSection" class="card glass animate-in">
+            <h2>Analyze an Image</h2>
+            <p class="subtitle">Drop a photo here to generate a detailed structural prompt.</p>
+            
+            <div id="dropZone" class="drop-zone">
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <div class="drop-content">
+                    <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag & drop your image here, or <strong>browse</strong></p>
+                    <span class="file-hint">Supports JPG, PNG, WEBP</span>
+                </div>
+            </div>
+
+            <div id="loadingIndicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Analyzing image structure...</p>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultSection" class="results-grid hidden">
+            <div class="card glass preview-card">
+                <h3>Original Image</h3>
+                <div class="image-wrapper">
+                    <img id="imagePreview" src="" alt="Uploaded image preview">
+                </div>
+                <button id="resetBtn" class="btn btn-secondary mt-4">Analyze Another Image</button>
+            </div>
+
+            <div class="card glass analysis-card">
+                <div class="card-header">
+                    <h3>Generated Prompt</h3>
+                    <button class="btn icon-btn" id="copyFinalBtn" title="Copy exact prompt">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="final-prompt-box">
+                    <p id="finalPromptText">Generating prompt...</p>
+                </div>
+
+                <h4 class="breakdown-title">Parameter Breakdown</h4>
+                <div class="parameters-list" id="parametersList">
+                    <!-- Dynamic parameters will be injected here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="apiKey">Gemini API Key</label>
+                    <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off">
+                    <p class="help-text">Your key is stored locally in your browser and is never sent to our servers. Get one from Google AI Studio.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">
+        Copied to clipboard!
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
