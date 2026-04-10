@@ -322,6 +322,19 @@ body {
     line-height: 1.5;
 }
 
+.sub-item { 
+    display: block; 
+    padding-left: 1rem; 
+    margin-top: 0.5rem; 
+    font-size: 0.9rem; 
+    color: #d1d5db; 
+}
+.sub-item em { 
+    color: var(--text-secondary); 
+    font-style: normal; 
+    font-weight: 500;
+}
+
 /* Modal */
 .modal {
     position: fixed;

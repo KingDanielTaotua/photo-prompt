@@ -143,15 +143,47 @@ function mockAnalysis() {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve({
-                medium: "Digital illustration",
-                primary_subject: "a glowing neon-lit sports car",
-                action_pose: "speeding down an empty highway",
-                environment: "a dense cyberpunk city street at night",
-                camera_angle: "low angle dynamic shot",
-                lighting: "harsh dramatic shadows and neon rim light",
-                color_palette: "vibrant purples, deep blues, and cyan",
-                mood: "energetic and gritty",
-                technical_details: "8k resolution, highly detailed, Unreal Engine 5 render"
+                style: "Digital illustration, cyberpunk influence, hyper-realistic",
+                subject: {
+                    identity: "Female, 20s, East Asian descent",
+                    facial_structure: "Sharp jawline, high cheekbones, symmetrical features",
+                    skin: "Smooth texture, pale tone, glowing neon reflections",
+                    hair: "Short bob, thick density, synthetic glossy finish",
+                    body: "Tall impression, athletic proportions"
+                },
+                wardrobe: {
+                    clothing: "Techwear jacket, form-fitting suit, heavy layering",
+                    fabric: "Matte synthetic, reflective panels, textured mesh",
+                    accessories: "Goggles on forehead, oversized collar"
+                },
+                pose: "Looking over shoulder, chin tilted down, tense shoulders",
+                environment: {
+                    location: "Neon-lit alleyway rooftop",
+                    depth_layers: "Foreground pipes / midground character / background blurred skyscrapers",
+                    interaction: "Leaning against a rain-slicked wall"
+                },
+                camera: {
+                    shot_type: "Mid-shot",
+                    angle: "Slight low angle",
+                    lens: "50mm prime",
+                    aperture: "Shallow depth of field"
+                },
+                lighting: {
+                    source: "Artificial street lights",
+                    position: "Backlight with rim lighting",
+                    quality: "Hard directional light",
+                    shadow_behavior: "Long deep shadows",
+                    additional: "Cyan bounce light on face"
+                },
+                color: {
+                    palette: "Cyan, magenta, deep blacks",
+                    contrast: "High cinematic contrast",
+                    temperature: "Cool overall with warm neon accents"
+                },
+                mood: "Gritty, tense, mysterious narrative",
+                micro_details: "Raindrops on jacket, subtle skin pores, glowing seams",
+                output_quality: "8k resolution, ultra-detailed, cinematic masterpiece",
+                negative: "no distortion, no extra limbs, no blur, no artifacts, no style drift"
             });
         }, 1500);
     });
@@ -164,15 +196,47 @@ async function analyzeImage(base64Data, mimeType) {
 
     const schemaStr = `
     {
-        "medium": "The visual format or artistic method (e.g., Digital illustration, 35mm photography, watercolor painting, cinematic 3D render).",
-        "primary_subject": "The core focal point, described with specific physical attributes, age, or clothing.",
-        "action_pose": "The kinetic state of the subject.",
-        "environment": "The background and spatial context.",
-        "camera_angle": "The framing of the subject (e.g., extreme close-up, wide-angle landscape, Dutch angle).",
-        "lighting": "The directional or ambient light sources (e.g., golden hour sunlight, harsh dramatic shadows).",
-        "color_palette": "The dominant hues or specific color grading (e.g., monochromatic, vibrant pastels).",
-        "mood": "The emotional resonance or environmental tone.",
-        "technical_details": "Descriptors for output quality or specific rendering engines (e.g., 8k resolution, highly detailed, Unreal Engine 5)."
+        "style": "Exact format + stylistic influence + realism level",
+        "subject": {
+            "identity": "gender, age range, ethnicity if relevant",
+            "facial_structure": "jawline, cheekbones, eyes, nose, symmetry",
+            "skin": "texture, tone, imperfections",
+            "hair": "style, density, flow, finish",
+            "body": "height impression, proportions, posture bias"
+        },
+        "wardrobe": {
+            "clothing": "type, fit, layering",
+            "fabric": "material physics: matte, reflective, sheer, textured",
+            "accessories": "exact placement + scale"
+        },
+        "pose": "Precise positioning of limbs, head tilt, eye direction, tension in body",
+        "environment": {
+            "location": "specific type",
+            "depth_layers": "foreground / midground / background elements",
+            "interaction": "how subject sits in environment"
+        },
+        "camera": {
+            "shot_type": "close-up, mid, full-body",
+            "angle": "eye-level, low angle, high angle",
+            "lens": "35mm, 50mm, 85mm, wide",
+            "aperture": "shallow vs deep"
+        },
+        "lighting": {
+            "source": "natural, studio, artificial",
+            "position": "front-left, backlight, overhead",
+            "quality": "soft, hard, diffused",
+            "shadow_behavior": "length, softness",
+            "additional": "rim light, bounce, reflections"
+        },
+        "color": {
+            "palette": "dominant tones",
+            "contrast": "high, low, cinematic",
+            "temperature": "warm, cool, neutral"
+        },
+        "mood": "Emotional tone + narrative implication",
+        "micro_details": "imperfections, texture realism, environmental effects",
+        "output_quality": "8k, ultra-detailed, sharp focus, cinematic",
+        "negative": "no distortion, no extra limbs, no blur, no artifacts, no style drift"
     }`;
 
     try {
@@ -225,34 +289,56 @@ async function analyzeImage(base64Data, mimeType) {
 
 // Render the final output structures
 function renderResult(data) {
-    // Construct the final string based on user's exact format requirement
-    generatedPromptStr = `${capitalize(data.medium)} of ${data.primary_subject}, ${data.action_pose}, located in ${data.environment}. ${capitalize(data.camera_angle)}, ${data.lighting}, ${data.color_palette}. ${capitalize(data.mood)}, ${data.technical_details}.`;
+    // Option A: Flatten the structured object into a comma-separated paragraph string
+    const flatProps = [
+        data.style,
+        data.subject?.identity, data.subject?.facial_structure, data.subject?.skin, data.subject?.hair, data.subject?.body,
+        data.wardrobe?.clothing, data.wardrobe?.fabric, data.wardrobe?.accessories,
+        data.pose,
+        data.environment?.location, data.environment?.depth_layers, data.environment?.interaction,
+        data.camera?.shot_type, data.camera?.angle, data.camera?.lens, data.camera?.aperture,
+        data.lighting?.source, data.lighting?.position, data.lighting?.quality, data.lighting?.shadow_behavior, data.lighting?.additional,
+        data.color?.palette, data.color?.contrast, data.color?.temperature,
+        data.mood,
+        data.micro_details,
+        data.output_quality
+    ].filter(Boolean); // remove any empty/undefined fields
 
+    generatedPromptStr = flatProps.join(", ") + " --no " + (data.negative || "distortion, artifacts");
     finalPromptText.textContent = generatedPromptStr;
 
-    // Render parameters breakdown
-    const displayMap = {
-        'Medium/Art Style': data.medium,
-        'Primary Subject': data.primary_subject,
-        'Action/Pose': data.action_pose,
-        'Environment/Setting': data.environment,
-        'Camera Angle/Composition': data.camera_angle,
-        'Lighting': data.lighting,
-        'Color Palette': data.color_palette,
-        'Mood/Atmosphere': data.mood,
-        'Technical Details/Resolution': data.technical_details
-    };
+    // Render parameters breakdown using a nested structure
+    const displayGroups = [
+        { title: '1. Medium / Style', value: data.style },
+        { title: '2. Primary Subject', props: { 'Identity': data.subject?.identity, 'Facial structure': data.subject?.facial_structure, 'Skin': data.subject?.skin, 'Hair': data.subject?.hair, 'Body': data.subject?.body } },
+        { title: '3. Wardrobe & Materials', props: { 'Clothing': data.wardrobe?.clothing, 'Fabric': data.wardrobe?.fabric, 'Accessories': data.wardrobe?.accessories } },
+        { title: '4. Pose / Action', value: data.pose },
+        { title: '5. Environment / Setting', props: { 'Location': data.environment?.location, 'Depth layers': data.environment?.depth_layers, 'Interaction': data.environment?.interaction } },
+        { title: '6. Camera & Lens', props: { 'Shot type': data.camera?.shot_type, 'Angle': data.camera?.angle, 'Lens': data.camera?.lens, 'Aperture / DOF': data.camera?.aperture } },
+        { title: '7. Lighting (Technical)', props: { 'Source': data.lighting?.source, 'Position': data.lighting?.position, 'Quality': data.lighting?.quality, 'Shadow behavior': data.lighting?.shadow_behavior, 'Additional': data.lighting?.additional } },
+        { title: '8. Color & Grading', props: { 'Palette': data.color?.palette, 'Contrast': data.color?.contrast, 'Temperature': data.color?.temperature } },
+        { title: '9. Mood / Intent', value: data.mood },
+        { title: '10. Micro-Details', value: data.micro_details },
+        { title: '11. Output Quality', value: data.output_quality },
+        { title: '12. Negative Constraints', value: data.negative }
+    ];
 
     parametersList.innerHTML = '';
-    for (const [key, value] of Object.entries(displayMap)) {
+    displayGroups.forEach(group => {
         const item = document.createElement('div');
         item.className = 'param-item';
-        item.innerHTML = `
-            <strong>${key}</strong>
-            <span>${value}</span>
-        `;
+        
+        let innerHTML = `<strong>${group.title}</strong>`;
+        if (group.value) {
+            innerHTML += `<span>${group.value}</span>`;
+        } else if (group.props) {
+            Object.entries(group.props).forEach(([k, v]) => {
+                if(v) innerHTML += `<span class="sub-item"><em>${k}:</em> ${v}</span>`;
+            });
+        }
+        item.innerHTML = innerHTML;
         parametersList.appendChild(item);
-    }
+    });
 
     // Switch views
     uploadSection.classList.add('hidden');
