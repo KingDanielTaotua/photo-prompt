@@ -41,4 +41,4 @@ To run this project on your personal machine:
 - Google Generative AI Web SDK `@google/generative-ai`
 
 ---
-*Created by [Daniel Taotua](mailto:dtao2r@gmail.com).*
+*Created by [Daniel Taotua](https://www.instagram.com/danieltaotua/).*
