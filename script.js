@@ -190,7 +190,21 @@ async function analyzeImage(base64Data, mimeType) {
 
             const imagePart = base64ToGenerativePart(base64Data, mimeType);
 
-            const result = await model.generateContent([prompt, imagePart]);
+            let result;
+            let retries = 3;
+            while (retries > 0) {
+                try {
+                    result = await model.generateContent([prompt, imagePart]);
+                    break;
+                } catch (e) {
+                    if (e.message.includes('503') && retries > 1) {
+                        retries--;
+                        await new Promise(r => setTimeout(r, 2000)); // wait 2s
+                        continue;
+                    }
+                    throw e;
+                }
+            }
             const response = await result.response;
             const text = response.text();
             
